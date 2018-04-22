@@ -2,15 +2,19 @@ FROM python:3-alpine
 
 MAINTAINER Andrii Burdeinyi <holden1853caulfield@gmail.com>
 
+# Expose the Flask port
+EXPOSE 80
+
 WORKDIR /opt/app
 
-RUN pip install flask
+RUN apk update && apk add py-virtualenv
 
 COPY . .
 
-ENTRYPOINT ["python"]
+# Installing python environment
+RUN  pip install --upgrade pip && \
+     pip install -r requirements.txt
 
-# Expose the Flask port
-EXPOSE 80
+ENTRYPOINT ["python"]
 
 CMD ["./web/app.py"]
