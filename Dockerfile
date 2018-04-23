@@ -9,12 +9,14 @@ WORKDIR /opt/app
 
 RUN apk update && apk add py-virtualenv
 
-COPY . .
+ADD requirements.txt requirements.txt
 
 # Installing python environment
 RUN  pip install --upgrade pip && \
      pip install -r requirements.txt
 
+COPY . .
+
 ENTRYPOINT ["python"]
 
-CMD ["./web/app.py"]
+CMD ["./run.py"]
