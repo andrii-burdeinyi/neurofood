@@ -11,12 +11,14 @@ RUN apk update && apk add py-virtualenv
 
 ADD requirements.txt requirements.txt
 
-# Installing python environment
-RUN  pip install --upgrade pip && \
-     pip install -r requirements.txt
+RUN python3 -m venv venv
+
+RUN . venv/bin/activate && \
+    pip install --upgrade pip && \
+    pip install -r requirements.txt
 
 COPY . .
 
-ENTRYPOINT ["python"]
+ENTRYPOINT ["sh"]
 
-CMD ["./run.py"]
+CMD ["start.sh"]
