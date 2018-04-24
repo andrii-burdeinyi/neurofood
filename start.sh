@@ -3,9 +3,7 @@
 DEV_MODE=${DEV_MODE:-false}
 
 if [ ${DEV_MODE} = true ]; then
-    if [ -d "venv" ]; then
-        rm -rf venv
-    fi
+    rm -rf venv
 
     python3 -m venv venv
 
@@ -13,5 +11,7 @@ if [ ${DEV_MODE} = true ]; then
     pip install --upgrade pip && \
     pip install -r requirements.txt
 fi
+
+chown -R 1000:1000 venv
 
 python3 run.py
