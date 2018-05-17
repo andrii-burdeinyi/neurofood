@@ -2,16 +2,14 @@
 
 DEV_MODE=${DEV_MODE:-false}
 
-if [ ${DEV_MODE} = true ]; then
-    rm -rf venv
+rm -rf venv
 
-    python3 -m venv venv
+python3 -m venv venv
 
-    . venv/bin/activate && \
-    pip install --upgrade pip && \
-    pip install -r requirements.txt
-fi
+. venv/bin/activate && \
+pip install --upgrade pip && \
+pip install -r requirements.txt
 
 chown -R 1000:1000 venv
 
-python3 run.py
+python3 app.py

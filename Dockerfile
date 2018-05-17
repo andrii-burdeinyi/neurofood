@@ -6,8 +6,8 @@ MAINTAINER Andrii Burdeinyi <holden1853caulfield@gmail.com>
 EXPOSE 80
 
 WORKDIR /opt/app
-
-RUN apk update && apk add py-virtualenv
+# TODO write stuff for crontab running
+RUN apk update && apk add py-virtualenv py-mysqldb mariadb-dev build-base mariadb-client-libs
 
 ADD requirements.txt requirements.txt
 
