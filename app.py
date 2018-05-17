@@ -27,25 +27,32 @@ def run():
     form = RunForm(data=request.get_json())
     if not form.validate():
         return json.dumps(form.errors)
-    return 'Neiurofood has been run'
+    return 'Neurofood has been run'
 
 
 @app.cli.command()
 def train():
     cursor = mysql.connection.cursor()
 
-    cursor.execute("SELECT mi.id, food_id from `menu_item` mi LEFT JOIN dish d on mi.dish_id = d.id")
+    cursor.execute("SELECT mi.id, food_id FROM `menu_item` mi LEFT JOIN dish d ON mi.dish_id = d.id")
     menu_items_path = os.getcwd() + '/data/menu_items.csv'
     write_to_csv(menu_items_path, cursor.fetchall())
 
-    cursor.execute("SELECT menu_item_id, food_id, user_id from `order_line` ol LEFT JOIN menu_item mi on ol.menu_item_id = mi.id LEFT JOIN dish d on mi.dish_id = d.id")
+    cursor.execute("SELECT menu_item_id, food_id, user_id FROM `order_line` ol "
+                   "LEFT JOIN menu_item mi ON ol.menu_item_id = mi.id LEFT JOIN dish d ON mi.dish_id = d.id")
     orders_path = os.getcwd() + '/data/orders.csv'
     write_to_csv(orders_path, cursor.fetchall())
 
-    # TODO: write sql query for generating features csv
-    # cursor.execute("")
-    # features_path = os.getcwd() + '/data/features.csv'
-    # write_to_csv(features_path, cursor.fetchall())
+
+    # TODO: add chance of ordering and features normalization
+    cursor.execute("SELECT r1.food_id, r1.price, ff.feature_id FROM "
+                   "(SELECT max(menu_item.id) as menu_item_id, d.food_id, price FROM menu_item "
+                   "LEFT JOIN dish d ON menu_item.dish_id = d.id "
+                   "WHERE food_id IS NOT NULL group by food_id ORDER BY food_id) r1 "
+                   "LEFT JOIN food_feature ff ON r1.food_id = ff.food_id")
+
+    features_path = os.getcwd() + '/data/features.csv'
+    write_to_csv(features_path, cursor.fetchall())
 
     # TODO: call learn_neural_network func to train network
     #learn_neural_network('', menu_items_path, orders_path, None)
