@@ -61,7 +61,7 @@ def write_to_csv(file_path, results):
         csv_out = csv.writer(out)
         for row in results:
             csv_out.writerow(row)
-    return
+        return
 
 if __name__ == '__main__':
     # Bind to PORT if defined, otherwise default to 80.

@@ -6,6 +6,7 @@ services:
         restart: unless-stopped
         volumes:
             - "./:/opt/app"
+            - "/run/mysqld/mysqld.sock:/run/mysqld/mysqld.sock"
         environment:
             CONTAINER_FLASK_PORT: ${CONTAINER_FLASK_PORT:-80}
             EXTERNAL_FLASK_PORT: ${EXTERNAL_FLASK_PORT:-8087}
