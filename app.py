@@ -34,7 +34,7 @@ def run():
 def train():
     cursor = mysql.connection.cursor()
 
-    cursor.execute("SELECT mi.id, food_id FROM `menu_item` mi LEFT JOIN dish d ON mi.dish_id = d.id")
+    cursor.execute("SELECT mi.id, food_id FROM `menu_item` mi LEFT JOIN dish d ON mi.dish_id = d.id WHERE d.food_id IS NOT NULL")
     menu_items_path = os.getcwd() + '/data/menu_items.csv'
     write_to_csv(menu_items_path, cursor.fetchall())
 
