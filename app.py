@@ -44,14 +44,10 @@ def train():
     write_to_csv(orders_path, cursor.fetchall())
 
 
-    # TODO: add chance of ordering and features normalization
-    cursor.execute("SELECT r1.food_id, r1.price, ff.feature_id FROM "
-                   "(SELECT max(menu_item.id) as menu_item_id, d.food_id, price FROM menu_item "
-                   "LEFT JOIN dish d ON menu_item.dish_id = d.id "
-                   "WHERE food_id IS NOT NULL group by food_id ORDER BY food_id) r1 "
-                   "LEFT JOIN food_feature ff ON r1.food_id = ff.food_id")
+    # TODO: add chance of ordering, price and features normalization
+    cursor.execute("SELECT food_id, feature_id from food_feature;")
 
-    features_path = os.getcwd() + '/data/features.csv'
+    features_path = os.getcwd() + '/data/food_features.csv'
     write_to_csv(features_path, cursor.fetchall())
 
     # TODO: call learn_neural_network func to train network
