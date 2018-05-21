@@ -39,7 +39,8 @@ def train():
     write_to_csv(menu_items_path, cursor.fetchall())
 
     cursor.execute("SELECT menu_item_id, food_id, user_id FROM `order_line` ol "
-                   "LEFT JOIN menu_item mi ON ol.menu_item_id = mi.id LEFT JOIN dish d ON mi.dish_id = d.id")
+                   "LEFT JOIN menu_item mi ON ol.menu_item_id = mi.id LEFT JOIN dish d ON mi.dish_id = d.id "
+                   "WHERE food_id IS NOT NULL ORDER BY user_id ASC")
     orders_path = os.getcwd() + '/data/orders.csv'
     write_to_csv(orders_path, cursor.fetchall())
 
