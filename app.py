@@ -54,7 +54,7 @@ def train():
                    "(SELECT count(*) FROM (SELECT DISTINCT menu_id, day_of_week FROM menu_item) mi), sum(menu_item.price) / count(menu_item.id) FROM menu_item "
                    "LEFT JOIN dish ON menu_item.dish_id = dish.id LEFT JOIN food ON dish.food_id = food.id "
                    "WHERE dish.food_id IS NOT NULL GROUP BY food.id ORDER BY food.id ASC;")
-    price_and_chance_path = os.getcwd() + '/data/price_and_chance.csv'
+    price_and_chance_path = os.getcwd() + '/data/chance_and_price.csv'
     write_to_csv(price_and_chance_path, cursor.fetchall())
 
     # TODO: call learn_neural_network func to train network
