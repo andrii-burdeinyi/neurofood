@@ -1,16 +1,27 @@
-version: '3'
+version: '3.2'
 
 services:
     neurofood:
         build: .
         restart: unless-stopped
         volumes:
-            - "./:/opt/app"
+            - "./neuro:/opt/app/neuro"
+            - "./web:/opt/app/web"
+            - "./app.py:/opt/app/app.py"
+            - "./config.py:/opt/app/config.py"
+            - "./crontab:/opt/app/crontab"
             - "/run/mysqld/mysqld.sock:/run/mysqld/mysqld.sock"
+            - "venv:/opt/app/venv"
         environment:
             CONTAINER_FLASK_PORT: ${CONTAINER_FLASK_PORT:-80}
             EXTERNAL_FLASK_PORT: ${EXTERNAL_FLASK_PORT:-8087}
             FLASK_DEBUG: ${FLASK_DEBUG:-true}
             DEV_MODE: ${DEV_MODE:-true}
+
         ports:
           - ${EXTERNAL_FLASK_PORT:-8087}:80
+volumes:
+   venv:
+       driver: local-persist
+       driver_opts:
+          mountpoint: ${PWD}/venv

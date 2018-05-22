@@ -11,3 +11,8 @@ Setting Path: ```Settings > Project > Project Interpreter > Add > Docker```
 If you have no Docker Server create **Unix socket** server
 <br>
 Interpreter path : ```/opt/app/venv/bin/python```
+
+### Docker local-persist driver install
+```text
+curl -fsSL https://raw.githubusercontent.com/CWSpear/local-persist/master/scripts/install.sh | sudo bash
+```

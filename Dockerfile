@@ -19,6 +19,5 @@ RUN . venv/bin/activate && \
 
 COPY . .
 
-ENTRYPOINT ["sh"]
-
-CMD ["start.sh"]
+RUN ["chmod", "+x", "/opt/app/entrypoint.sh"]
+CMD ["/opt/app/entrypoint.sh"]

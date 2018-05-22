@@ -46,10 +46,16 @@ def train():
 
 
     # TODO: add chance of ordering, price and features normalization
-    cursor.execute("SELECT food_id, feature_id from food_feature;")
-
+    cursor.execute("SELECT food_id, feature_id FROM food_feature;")
     features_path = os.getcwd() + '/data/food_features.csv'
     write_to_csv(features_path, cursor.fetchall())
+
+    cursor.execute("SELECT food.id, count(menu_item.id) / "
+                   "(SELECT count(*) FROM (SELECT DISTINCT menu_id, day_of_week FROM menu_item) mi), sum(menu_item.price) / count(menu_item.id) FROM menu_item "
+                   "LEFT JOIN dish ON menu_item.dish_id = dish.id LEFT JOIN food ON dish.food_id = food.id "
+                   "WHERE dish.food_id IS NOT NULL GROUP BY food.id ORDER BY food.id ASC;")
+    price_and_chance_path = os.getcwd() + '/data/price_and_chance.csv'
+    write_to_csv(price_and_chance_path, cursor.fetchall())
 
     # TODO: call learn_neural_network func to train network
     #learn_neural_network('', menu_items_path, orders_path, None)
