@@ -6,6 +6,7 @@ services:
         restart: unless-stopped
         volumes:
             - "./neuro:/opt/app/neuro"
+            - "./data:/opt/app/data"
             - "./web:/opt/app/web"
             - "./app.py:/opt/app/app.py"
             - "./config.py:/opt/app/config.py"
