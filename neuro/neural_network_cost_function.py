@@ -3,7 +3,6 @@ from neuro.sigmoid import sigmoid
 from neuro.sigmoid_gradient import sigmoid_gradient
 
 
-# done
 def neural_network_cost_function(nn_params, input_layer_size, hidden_layer_size, num_labels, x, y, lambda_param):
 
     theta1 = nn_params[0:hidden_layer_size * (input_layer_size + 1)]\

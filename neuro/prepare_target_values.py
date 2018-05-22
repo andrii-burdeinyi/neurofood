@@ -1,7 +1,6 @@
 import numpy as np
 
 
-# done
 def prepare_target_values(menu_items, orders):
     m = menu_items.shape[0]
     y = np.zeros(m)

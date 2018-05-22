@@ -3,16 +3,16 @@ import numpy as np
 from neuro.load_data import load_data
 from neuro.combine_data import combine_data
 from neuro.gradient_descent import gradient_descent
+from neuro.generate_features import generate_features
 from neuro.feature_normalize import feature_normalize
 from neuro.prepare_target_values import prepare_target_values
 from neuro.rand_initialize_weights import rand_initialize_weights
 
 
-# done
-def learn_neural_network(features_url, menu_items_url, orders_url, user_id):
+def learn_neural_network(food_feature_url, chance_and_price_url, menu_items_url, orders_url, user_id):
     orders = load_data(orders_url)
-    features = load_data(features_url)
     menu_items = load_data(menu_items_url)
+    features = generate_features(food_feature_url, chance_and_price_url)
 
     x = combine_data(menu_items, features)
     x, mu, sigma = feature_normalize(x)
@@ -31,7 +31,7 @@ def learn_neural_network(features_url, menu_items_url, orders_url, user_id):
     initial_nn_params = np.concatenate((initial_theta1.reshape(-1), initial_theta2.reshape(-1)), axis=0)
 
     alpha = 4
-    num_iters = 10
+    num_iters = 200
     lambda_param = 0.5
 
     nn_params, j_history = gradient_descent(initial_nn_params, input_layer_size,

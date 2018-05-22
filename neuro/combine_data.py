@@ -1,7 +1,6 @@
 import numpy as np
 
 
-# done
 def combine_data(menu_items, features):
     m = menu_items.shape[0]
     n = features.shape[1]-1

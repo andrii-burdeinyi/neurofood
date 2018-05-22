@@ -2,7 +2,6 @@ import numpy as np
 from neuro.normalize_data import normalize_data
 
 
-# done
 def feature_normalize(x):
     m = x.shape[0]
     mu = sum(x)/m

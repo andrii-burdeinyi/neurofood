@@ -2,7 +2,6 @@ import numpy as np
 from neuro.neural_network_cost_function import neural_network_cost_function
 
 
-# done
 def gradient_descent(nn_params, input_layer_size, hidden_layer_size, num_labels, x, y, lambda_param, alpha, num_iters):
     j_history = np.zeros(num_iters)
 
