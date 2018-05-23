@@ -15,4 +15,4 @@ def predict_order(food_feature_url, chance_and_price_url, new_menu_items, user_i
 
     p = predict(theta1, theta2, x)
 
-    return np.column_stack((new_menu_items[:, 1], p*100))
+    return np.column_stack((new_menu_items[:, 0], p*100))
