@@ -1,47 +1,32 @@
-import os
-import numpy as np
-from neuro.load_data import load_data
-from neuro.combine_data import combine_data
-from neuro.gradient_descent import gradient_descent
+from neuro.load_data import load_data_from_csv
+from neuro.learn_neural_network_per_user import learn_neural_network_per_user
 from neuro.generate_features import generate_features
-from neuro.feature_normalize import feature_normalize
-from neuro.prepare_target_values import prepare_target_values
-from neuro.rand_initialize_weights import rand_initialize_weights
+import numpy as np
+import multiprocessing as mp
+from functools import partial
 
 
-def learn_neural_network(food_feature_url, chance_and_price_url, menu_items_url, orders_url, user_id):
-    orders = load_data(orders_url)
-    menu_items = load_data(menu_items_url)
+def learn_neural_network(food_feature_url, chance_and_price_url, menu_items_url, orders_url):
+    orders = load_data_from_csv(orders_url)
+    menu_items = load_data_from_csv(menu_items_url)
     features = generate_features(food_feature_url, chance_and_price_url)
 
-    x = combine_data(menu_items, features)
-    x, mu, sigma = feature_normalize(x)
-    y = prepare_target_values(menu_items, orders)
+    users = orders[:, 2]
+    users = np.unique(users)
+    users = users.astype(int)
 
-    if not os.path.exists("neuro/params/" + str(user_id)):
-        os.makedirs("neuro/params/" + str(user_id))
-    np.save("neuro/params/" + str(user_id) + "/normalization", [mu, sigma])
+    learn_partial = partial(closure, features=features, menu_items=menu_items, orders=orders)
 
-    input_layer_size = 74
-    hidden_layer_size = 25
-    num_labels = 1
-
-    initial_theta1 = rand_initialize_weights(input_layer_size, hidden_layer_size)
-    initial_theta2 = rand_initialize_weights(hidden_layer_size, num_labels)
-    initial_nn_params = np.concatenate((initial_theta1.reshape(-1), initial_theta2.reshape(-1)), axis=0)
-
-    alpha = 4
-    num_iters = 200
-    lambda_param = 0.5
-
-    nn_params, j_history = gradient_descent(initial_nn_params, input_layer_size,
-                                              hidden_layer_size, num_labels, x, y, lambda_param, alpha, num_iters)
-
-    theta1 = nn_params[0:hidden_layer_size * (input_layer_size + 1)]\
-        .reshape([hidden_layer_size, input_layer_size + 1])
-    theta2 = nn_params[hidden_layer_size * (input_layer_size + 1):nn_params.shape[0]]\
-        .reshape([num_labels, hidden_layer_size + 1])
-
-    np.save("neuro/params/" + str(user_id) + "/weights", [theta1, theta2])
+    with mp.Pool(mp.cpu_count()) as p:
+        p.map(learn_partial, users)
 
     return True
+
+
+def closure(user, features, menu_items, orders):
+    index_from = np.where(orders[:, 2] == user)[0][0]
+    index_to = np.where(orders[:, 2] == user)[0][-1] + 1
+
+    learn_neural_network_per_user(features, menu_items, orders[int(index_from):int(index_to), 0:2], user)
+
+    return

@@ -1,4 +1,8 @@
-from wtforms import Form, StringField, validators
+from wtforms import Form, validators, IntegerField
+import wtforms_json
+
+wtforms_json.init()
 
 class RunForm(Form):
-    username = StringField('username', [validators.Length(min=2, max=25)])
+    user_id = IntegerField('userId', [validators.DataRequired(), validators.NumberRange(min=1)])
+    day_of_week = IntegerField('dayOfWeek', [validators.DataRequired(), validators.NumberRange(min=1, max=5)])

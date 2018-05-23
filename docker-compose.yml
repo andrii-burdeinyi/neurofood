@@ -18,6 +18,9 @@ services:
             EXTERNAL_FLASK_PORT: ${EXTERNAL_FLASK_PORT:-8087}
             FLASK_DEBUG: ${FLASK_DEBUG:-true}
             DEV_MODE: ${DEV_MODE:-true}
+            ALPHA: ${ALPHA:-4}
+            NUM_ITERS: ${NUM_ITERS:-200}
+            LAMBDA_PARAM: ${LAMBDA_PARAM:-0.5}
 
         ports:
           - ${EXTERNAL_FLASK_PORT:-8087}:80

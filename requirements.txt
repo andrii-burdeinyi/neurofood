@@ -1,4 +1,5 @@
 Flask
+wtforms_json
 WTForms
 flask-mysqldb
 Click
