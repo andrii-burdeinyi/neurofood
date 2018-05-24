@@ -3,7 +3,6 @@ import json
 import csv
 import shutil
 
-import MySQLdb
 from flask import Flask, request
 from web.forms.RunForm import RunForm
 from neuro.learn_neural_network import learn_neural_network
@@ -11,6 +10,7 @@ from neuro.predict_order import predict_order
 from flask_mysqldb import MySQL
 from neuro.load_data import transform_data
 from flask import jsonify
+import datetime
 
 app = Flask(__name__)
 mysql = MySQL()
@@ -61,17 +61,26 @@ def serialize(data):
 
 @app.cli.command()
 def train():
+    print("Starting training : ")
+    print(datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
+
     fetch_from_database_to_csv()
     learn_neural_network(food_feature_path, chance_and_price_path, menu_items_path, orders_path)
 
+    print("Training is finished : ")
+    print(datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
     return
 
 
 def fetch_from_database_to_csv():
-    shutil.rmtree(food_feature_path)
-    shutil.rmtree(chance_and_price_path)
-    shutil.rmtree(menu_items_path)
-    shutil.rmtree(orders_path)
+    if os.path.exists(food_feature_path):
+         os.remove(food_feature_path)
+    if os.path.exists(chance_and_price_path):
+        os.remove(chance_and_price_path)
+    if os.path.exists(menu_items_path):
+        os.remove(menu_items_path)
+    if os.path.exists(orders_path):
+        os.remove(orders_path)
 
     cursor = mysql.connection.cursor()
 

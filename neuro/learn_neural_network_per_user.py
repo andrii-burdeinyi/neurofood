@@ -30,7 +30,7 @@ def learn_neural_network_per_user(features, menu_items, orders, user_id):
     lambda_param = os.getenv('LAMBDA_PARAM', 0.5)
 
     nn_params, j_history = gradient_descent(initial_nn_params, input_layer_size,
-                                              hidden_layer_size, num_labels, x, y, lambda_param, alpha, num_iters)
+                                              hidden_layer_size, num_labels, x, y, float(lambda_param), int(alpha), int(num_iters))
 
     theta1 = nn_params[0:hidden_layer_size * (input_layer_size + 1)]\
         .reshape([hidden_layer_size, input_layer_size + 1])
