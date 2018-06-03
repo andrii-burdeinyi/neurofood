@@ -18,10 +18,8 @@ RUN apk add nginx \
 RUN apk add --no-cache supervisor
 COPY docker/supervisor/supervisord.ini /etc/supervisor.d/supervisord.ini
 
-RUN chown -R nginx:nginx /opt/app
-
-RUN mkdir -p /var/log/uwsgi
 # UWSGI
+RUN mkdir -p /var/log/uwsgi
 ADD docker/uwsgi/uwsgi.conf /etc/init
 COPY docker/uwsgi/neurofood_uwsgi.ini /etc/uwsgi/uwsgi.ini
 RUN chown -R nginx:nginx /var/log/uwsgi/
@@ -30,7 +28,6 @@ RUN chown -R nginx:nginx /var/log/uwsgi/
 COPY docker/nginx/nginx.conf /etc/nginx/nginx.conf
 RUN chown -R nginx:nginx /var/log/uwsgi/
 COPY docker/nginx/neurofood.conf /etc/nginx/conf.d/default.conf
-RUN mkdir -p /run/nginx
 
 ADD requirements.txt requirements.txt
 RUN  pip install --upgrade pip && \
