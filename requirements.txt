@@ -4,3 +4,4 @@ WTForms
 flask-mysqldb
 Click
 numpy
+uwsgi

@@ -2,22 +2,43 @@ FROM python:3-alpine
 
 MAINTAINER Andrii Burdeinyi <holden1853caulfield@gmail.com>
 
-# Expose the Flask port
-EXPOSE 80
-
 WORKDIR /opt/app
 # TODO write stuff for crontab running
-RUN apk update && apk add py-virtualenv py-mysqldb mariadb-dev build-base mariadb-client-libs
+RUN apk update
+RUN apk add nginx \
+            py-virtualenv \
+            py-mysqldb \
+            mariadb-dev \
+            build-base \
+            mariadb-client-libs \
+            linux-headers \
+            openrc
+
+# Supervisord
+RUN apk add --no-cache supervisor
+COPY docker/supervisor/supervisord.ini /etc/supervisor.d/supervisord.ini
+
+RUN chown -R nginx:nginx /opt/app
+
+RUN mkdir -p /var/log/uwsgi
+# UWSGI
+ADD docker/uwsgi/uwsgi.conf /etc/init
+COPY docker/uwsgi/neurofood_uwsgi.ini /etc/uwsgi/uwsgi.ini
+RUN chown -R nginx:nginx /var/log/uwsgi/
+
+#NGINX
+COPY docker/nginx/nginx.conf /etc/nginx/nginx.conf
+RUN chown -R nginx:nginx /var/log/uwsgi/
+COPY docker/nginx/neurofood.conf /etc/nginx/conf.d/default.conf
+RUN mkdir -p /run/nginx
 
 ADD requirements.txt requirements.txt
-
-RUN python3 -m venv venv
-
-RUN . venv/bin/activate && \
-    pip install --upgrade pip && \
+RUN  pip install --upgrade pip && \
     pip install -r requirements.txt
 
 COPY . .
 
+RUN chown -R nginx:nginx .
+
 RUN ["chmod", "+x", "/opt/app/entrypoint.sh"]
-CMD ["/opt/app/entrypoint.sh"]
+ENTRYPOINT ["sh", "/opt/app/entrypoint.sh"]

@@ -114,5 +114,5 @@ def write_to_csv(file_path, results):
 
 if __name__ == '__main__':
     # Bind to PORT if defined, otherwise default to 80.
-    port = int(os.environ.get('PORT', os.getenv('CONTAINER_FLASK_PORT', 80)))
-    app.run(host='0.0.0.0', port=port, debug=True)
+    port = int(os.environ.get('PORT', os.getenv('CONTAINER_FLASK_PORT', 5000)))
+    app.run(host='0.0.0.0', port=5000, debug=True)
