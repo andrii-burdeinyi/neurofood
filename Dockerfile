@@ -6,12 +6,8 @@ WORKDIR /opt/app
 # TODO write stuff for crontab running
 RUN apk update
 RUN apk add nginx \
-            py-virtualenv \
-            py-mysqldb \
-            mariadb-dev \
-            build-base \
-            mariadb-client-libs \
             linux-headers \
+            build-base \
             openrc
 
 # Supervisord
@@ -24,11 +20,11 @@ ADD docker/uwsgi/uwsgi.conf /etc/init
 COPY docker/uwsgi/neurofood_uwsgi.ini /etc/uwsgi/uwsgi.ini
 RUN chown -R nginx:nginx /var/log/uwsgi/
 
-#NGINX
+# NGINX
 COPY docker/nginx/nginx.conf /etc/nginx/nginx.conf
 RUN chown -R nginx:nginx /var/log/uwsgi/
 COPY docker/nginx/neurofood.conf /etc/nginx/conf.d/default.conf
-
+# PYTHON LIBS
 ADD requirements.txt requirements.txt
 RUN  pip install --upgrade pip && \
     pip install -r requirements.txt

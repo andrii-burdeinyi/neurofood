@@ -1,4 +1,4 @@
-from neuro.load_data import load_data_from_csv
+from neuro.load_data import load_data_from_dict
 from neuro.learn_neural_network_per_user import learn_neural_network_per_user
 from neuro.generate_features import generate_features
 import numpy as np
@@ -6,10 +6,13 @@ import multiprocessing as mp
 from functools import partial
 
 
-def learn_neural_network(food_feature_url, chance_and_price_url, menu_items_url, orders_url):
-    orders = load_data_from_csv(orders_url)
-    menu_items = load_data_from_csv(menu_items_url)
-    features = generate_features(food_feature_url, chance_and_price_url)
+def learn_neural_network(food_features, chances_and_prices, menu_items, orders):
+    food_features = load_data_from_dict(food_features)
+    chances_and_prices = load_data_from_dict(chances_and_prices)
+    menu_items = load_data_from_dict(menu_items)
+    orders = load_data_from_dict(orders)
+
+    features = generate_features(food_features, chances_and_prices)
 
     users = orders[:, 2]
     users = np.unique(users)

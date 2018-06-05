@@ -1,32 +1,26 @@
 import os
 import json
 import csv
-import shutil
+import requests
 
 from flask import Flask, request
 from web.forms.RunForm import RunForm
 from neuro.learn_neural_network import learn_neural_network
 from neuro.predict_order import predict_order
-from flask_mysqldb import MySQL
-from neuro.load_data import transform_data
 from flask import jsonify
 import datetime
 
 app = Flask(__name__)
-mysql = MySQL()
 
-app.config['MYSQL_USER'] = os.getenv('MYSQL_USER', 'food')
-app.config['MYSQL_PASSWORD'] = os.getenv('MYSQL_PASSWORD', 'food')
-app.config['MYSQL_DB'] = os.getenv('MYSQL_DB', 'food')
-app.config['MYSQL_HOST'] = os.getenv('MYSQL_HOST', 'localhost')
-app.config['MYSQL_PORT'] = os.getenv('MYSQL_PORT', 3306)
+# API secret
+api_secret = os.getenv('API_SECRET', 'food2017')
 
-mysql.init_app(app)
-
-food_feature_path = os.getcwd() + '/data/food_features.csv'
-chance_and_price_path = os.getcwd() + '/data/chance_and_price.csv'
-menu_items_path = os.getcwd() + '/data/menu_items.csv'
-orders_path = os.getcwd() + '/data/orders.csv'
+# API URLs
+foods_features_api_url = 'https://api.food.dev.norse.digital/neurofood/features'
+chances_and_prices_api_url = 'https://api.food.dev.norse.digital/neurofood/prices'
+menu_items_api_url = 'https://api.food.dev.norse.digital/neurofood/menuitems'
+orders_api_url = 'https://api.food.dev.norse.digital/neurofood/orders'
+new_menu_items_api_url = 'https://api.food.dev.norse.digital/neurofood/new/menuitems'
 
 
 @app.route('/')
@@ -39,15 +33,25 @@ def run():
     form = RunForm(data=request.get_json())
 
     if not form.validate():
-        return json.dumps(form.errors)
+        return jsonify(form.day_of_week)
 
-    cursor = mysql.connection.cursor()
+    new_orders = json.loads(requests.get(
+        url=new_menu_items_api_url,
+        params={"day_of_week": str(form.day_of_week.data)},
+        headers={"secret": api_secret}
+    ).text)
 
-    cursor.execute("SELECT menu_item.id, dish.food_id FROM menu_item JOIN dish ON menu_item.dish_id = dish.id "
-                   "WHERE dish.food_id IS NOT NULL AND menu_item.menu_id = (SELECT max(id) FROM menu) "
-                   "and  menu_item.day_of_week = " + str(form.day_of_week.data) + " ORDER BY menu_item.day_of_week ASC;")
+    food_features = json.loads(requests.get(
+        url=foods_features_api_url,
+        headers={"secret": api_secret}
+    ).text)
 
-    result = predict_order(food_feature_path, chance_and_price_path, transform_data(cursor.fetchall()), form.user_id.data)
+    chance_and_prices = json.loads(requests.get(
+        url=chances_and_prices_api_url,
+        headers={"secret": api_secret}
+    ).text)
+
+    result = predict_order(food_features, chance_and_prices, new_orders, form.user_id.data)
 
     return jsonify(serialize(result.tolist()))
 
@@ -64,44 +68,30 @@ def train():
     print("Starting training : ")
     print(datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
 
-    fetch_from_database_to_csv()
-    learn_neural_network(food_feature_path, chance_and_price_path, menu_items_path, orders_path)
+    foods_features = json.loads(requests.get(
+        url=foods_features_api_url,
+        headers={"secret": api_secret}
+    ).text)
+
+    chances_and_prices = json.loads(requests.get(
+        url=chances_and_prices_api_url,
+        headers={"secret": api_secret}
+    ).text)
+
+    menu_items = json.loads(requests.get(
+        url=menu_items_api_url,
+        headers={"secret": api_secret}
+    ).text)
+
+    orders = json.loads(requests.get(
+        url=orders_api_url,
+        headers={"secret": api_secret}
+    ).text)
+
+    learn_neural_network(foods_features, chances_and_prices, menu_items, orders)
 
     print("Training is finished : ")
     print(datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
-    return
-
-
-def fetch_from_database_to_csv():
-    if os.path.exists(food_feature_path):
-         os.remove(food_feature_path)
-    if os.path.exists(chance_and_price_path):
-        os.remove(chance_and_price_path)
-    if os.path.exists(menu_items_path):
-        os.remove(menu_items_path)
-    if os.path.exists(orders_path):
-        os.remove(orders_path)
-
-    cursor = mysql.connection.cursor()
-
-    cursor.execute("SELECT food_id, feature_id FROM food_feature;")
-    write_to_csv(food_feature_path, cursor.fetchall())
-
-    cursor.execute("SELECT food.id, count(menu_item.id)/(SELECT count(*) FROM "
-                   "(select distinct menu_id, day_of_week from menu_item) mi), IFNULL(sum(menu_item.price)/count(menu_item.id), 0) from food "
-                   "LEFT JOIN dish on dish.food_id = food.id LEFT JOIN menu_item on menu_item.dish_id = dish.id "
-                   "group by food.id order by food.id ASC")
-    write_to_csv(chance_and_price_path, cursor.fetchall())
-
-    cursor.execute(
-        "SELECT mi.id, food_id FROM `menu_item` mi LEFT JOIN dish d ON mi.dish_id = d.id WHERE d.food_id IS NOT NULL")
-    write_to_csv(menu_items_path, cursor.fetchall())
-
-    cursor.execute("SELECT menu_item_id, food_id, user_id FROM `order_line` ol "
-                   "LEFT JOIN menu_item mi ON ol.menu_item_id = mi.id LEFT JOIN dish d ON mi.dish_id = d.id "
-                   "WHERE food_id IS NOT NULL ORDER BY user_id ASC")
-    write_to_csv(orders_path, cursor.fetchall())
-
     return
 
 
@@ -111,6 +101,7 @@ def write_to_csv(file_path, results):
         for row in results:
             csv_out.writerow(row)
         return
+
 
 if __name__ == '__main__':
     # Bind to PORT if defined, otherwise default to 80.
