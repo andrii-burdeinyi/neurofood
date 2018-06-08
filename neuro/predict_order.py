@@ -4,6 +4,7 @@ from neuro.combine_data import combine_data
 from neuro.normalize_data import normalize_data
 from neuro.generate_features import generate_features
 from neuro.load_data import load_data_from_dict
+from neuro import neuro_train_params_path
 
 
 def predict_order(food_features, chances_and_price, new_menu_items, user_id):
@@ -13,8 +14,8 @@ def predict_order(food_features, chances_and_price, new_menu_items, user_id):
 
     features = generate_features(food_features, chances_and_price)
 
-    mu, sigma = np.load("neuro/params/" + str(user_id) + "/normalization.npy")
-    theta1, theta2 = np.load("neuro/params/" + str(user_id) + "/weights.npy")
+    mu, sigma = np.load(neuro_train_params_path + str(user_id) + "/normalization.npy")
+    theta1, theta2 = np.load(neuro_train_params_path + str(user_id) + "/weights.npy")
 
     x = normalize_data(combine_data(new_menu_items, features), mu, sigma)
 

@@ -8,9 +8,11 @@ from web.forms.RunForm import RunForm
 from neuro.learn_neural_network import learn_neural_network
 from neuro.predict_order import predict_order
 from flask import jsonify
+from flask_cors import CORS
 import datetime
 
 app = Flask(__name__)
+CORS(app)
 
 # API secret
 api_secret = os.getenv('API_SECRET', 'food2017')
@@ -25,7 +27,7 @@ new_menu_items_api_url = 'https://api.food.dev.norse.digital/neurofood/new/menui
 
 @app.route('/')
 def hello():
-    return 'Hello Neurofood!'
+    return 'Hello Neurofood!(by Zuev, Burdeinyi and Berezovskyi)'
 
 
 @app.route('/run', methods=['POST'])

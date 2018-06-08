@@ -5,3 +5,4 @@ Click
 numpy
 uwsgi
 requests
+flask-cors

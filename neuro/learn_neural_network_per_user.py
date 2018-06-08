@@ -5,6 +5,7 @@ from neuro.gradient_descent import gradient_descent
 from neuro.feature_normalize import feature_normalize
 from neuro.prepare_target_values import prepare_target_values
 from neuro.rand_initialize_weights import rand_initialize_weights
+from neuro import neuro_train_params_path
 
 
 def learn_neural_network_per_user(features, menu_items, orders, user_id):
@@ -12,9 +13,9 @@ def learn_neural_network_per_user(features, menu_items, orders, user_id):
     x, mu, sigma = feature_normalize(x)
     y = prepare_target_values(menu_items, orders)
 
-    if not os.path.exists("neuro/params/" + str(user_id)):
-        os.makedirs("neuro/params/" + str(user_id))
-    np.save("neuro/params/" + str(user_id) + "/normalization", [mu, sigma])
+    if not os.path.exists(neuro_train_params_path + str(user_id)):
+        os.makedirs(neuro_train_params_path + str(user_id))
+    np.save(neuro_train_params_path + str(user_id) + "/normalization", [mu, sigma])
 
 
     input_layer_size = features.shape[1] - 1
@@ -37,6 +38,6 @@ def learn_neural_network_per_user(features, menu_items, orders, user_id):
     theta2 = nn_params[hidden_layer_size * (input_layer_size + 1):nn_params.shape[0]]\
         .reshape([num_labels, hidden_layer_size + 1])
 
-    np.save("neuro/params/" + str(user_id) + "/weights", [theta1, theta2])
+    np.save(neuro_train_params_path + str(user_id) + "/weights", [theta1, theta2])
 
     return True
