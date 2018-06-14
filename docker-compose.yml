@@ -20,5 +20,17 @@ services:
             NUM_ITERS: ${NUM_ITERS:-200}
             LAMBDA_PARAM: ${LAMBDA_PARAM:-0.5}
             API_SECRET: ${API_SECRET:-food2017}
+    nginx:
+        image: umputun/nginx-le:latest
+        restart: unless-stopped
+        volumes:
+            - ./docker/ssl:/etc/nginx/ssl
+            - ./docker/nginx/neurofood.conf:/etc/nginx/service.conf
         ports:
-          - 80:80
+            - "80:80"
+            - "443:443"
+        environment:
+            - TZ=Europe/Kiev
+            - LETSENCRYPT=true
+            - LE_EMAIL=holden1853caulfield@gmail.com
+            - LE_FQDN=neurofood.burdeinyi.com
