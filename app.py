@@ -39,7 +39,7 @@ def run():
 
     new_orders = json.loads(requests.get(
         url=new_menu_items_api_url,
-        params={"day_of_week": str(form.day_of_week.data), 'menu_id': str(form.menu_id)},
+        params={"day_of_week": str(form.day_of_week.data), 'menu_id': str(form.menu_id.data)},
         headers={"secret": api_secret}
     ).text)
 
